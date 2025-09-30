@@ -19,7 +19,9 @@ router.post('/header', async (req, res) => {
     }
     catch (err) {
         console.error("Failed to create header", err);
-        res.status(500).json({ error: "Failed to create header" });
+        const message = err?.message || "Failed to create header";
+        const reason = err?.errors?.[0]?.message || err?.response?.data?.error?.message;
+        res.status(500).json({ error: message, reason });
     }
 });
 router.post('/', async (req, res) => {
