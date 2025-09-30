@@ -15,24 +15,8 @@ const app = (0, express_1.default)();
 // Middlewares
 app.use((0, morgan_1.default)('tiny'));
 app.use((0, express_2.json)());
-// CORS
-const allowedOrigins = [
-    "http://localhost:3000",
-    "https://www.kubix.careers"
-];
-app.use((0, cors_1.default)({
-    origin: (origin, callback) => {
-        if (!origin) {
-            // Allow non-browser requests (e.g., curl, Postman)
-            return callback(null, true);
-        }
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-        return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true
-}));
+// CORS - allow all origins (reflect request origin)
+app.use((0, cors_1.default)({ origin: true, credentials: true }));
 // Handle preflight for all routes
 app.options("*", (0, cors_1.default)());
 // Routes
