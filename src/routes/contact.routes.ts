@@ -16,9 +16,11 @@ router.post('/header', async (req, res): Promise<void> => {
     }
     await sheetsService.ensureHeader(spreadsheetId, sheetName);
     res.status(200).json({ ok: true, sheetName });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Failed to create header", err);
-    res.status(500).json({ error: "Failed to create header" });
+    const message = err?.message || "Failed to create header";
+    const reason = err?.errors?.[0]?.message || err?.response?.data?.error?.message;
+    res.status(500).json({ error: message, reason });
   }
 });
 

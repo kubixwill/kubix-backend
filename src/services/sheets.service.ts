@@ -27,34 +27,70 @@ export class SheetsService {
     return auth;
   }
 
-  async ensureHeader(spreadsheetId: string, sheetName: string) {
+  private async ensureSheetExists(spreadsheetId: string, sheetName: string | undefined, auth: any): Promise<string> {
+    const meta = await this.sheets.spreadsheets.get({ auth, spreadsheetId });
+    const sheets = meta.data.sheets || [];
+    const firstTitle = sheets[0]?.properties?.title || "Sheet1";
+
+    if (!sheetName) {
+      return firstTitle;
+    }
+
+    const exists = sheets.some((s) => s.properties?.title === sheetName);
+    if (exists) return sheetName;
+
+    // Try to create, if forbidden, fall back to first sheet
+    try {
+      await this.sheets.spreadsheets.batchUpdate({
+        auth,
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            {
+              addSheet: {
+                properties: { title: sheetName },
+              },
+            },
+          ],
+        },
+      });
+      return sheetName;
+    } catch (e) {
+      return firstTitle;
+    }
+  }
+
+  async ensureHeader(spreadsheetId: string, sheetName: string | undefined): Promise<string> {
     const auth = this.getAuth();
+    const targetSheet = await this.ensureSheetExists(spreadsheetId, sheetName, auth);
+
     const res = await this.sheets.spreadsheets.values.get({
       auth,
       spreadsheetId,
-      range: `${sheetName}!1:1`,
+      range: `${targetSheet}!1:1`,
     });
 
     const existing = (res.data.values && res.data.values[0]) || [];
     const needsHeader = REQUIRED_HEADERS.some((h, i) => existing[i] !== h);
-    if (!needsHeader) return;
+    if (!needsHeader) return targetSheet;
 
     await this.sheets.spreadsheets.values.update({
       auth,
       spreadsheetId,
-      range: `${sheetName}!A1:C1`,
+      range: `${targetSheet}!A1:C1`,
       valueInputOption: "RAW",
       requestBody: { values: [REQUIRED_HEADERS] },
     });
+    return targetSheet;
   }
 
-  async appendRow(spreadsheetId: string, sheetName: string, fullName: string, email: string, message: string) {
+  async appendRow(spreadsheetId: string, sheetName: string | undefined, fullName: string, email: string, message: string) {
     const auth = this.getAuth();
-    await this.ensureHeader(spreadsheetId, sheetName);
+    const targetSheet = await this.ensureHeader(spreadsheetId, sheetName);
     await this.sheets.spreadsheets.values.append({
       auth,
       spreadsheetId,
-      range: `${sheetName}!A:C`,
+      range: `${targetSheet}!A:C`,
       valueInputOption: "RAW",
       insertDataOption: "INSERT_ROWS",
       requestBody: { values: [[fullName, email, message]] },
