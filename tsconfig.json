@@ -2,8 +2,12 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
+    "moduleResolution": "Node",
     "rootDir": "src",
     "outDir": "dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

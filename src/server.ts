@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import fs from "fs";
 import app from "./app";
+import { AppDataSource } from "./typeorm/data-source";
 
 // Load base environment variables
 dotenv.config({ path: ".env" });
@@ -19,7 +20,15 @@ if (environment && fs.existsSync(envFilePath)) {
 // Fetch PORT safely
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+// Initialize DB and then start server
+AppDataSource.initialize()
+  .then(() => {
+    console.log("Connected to PostgreSQL via TypeORM");
+    app.listen(port, () => {
+      console.log(`Server is running at http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to initialize database:", err);
+    process.exit(1);
+  });
