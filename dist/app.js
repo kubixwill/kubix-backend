@@ -18,7 +18,6 @@ app.use((0, express_2.json)());
 // CORS - allow all origins (reflect request origin)
 app.use((0, cors_1.default)({ origin: true, credentials: true }));
 // Handle preflight for all routes
-app.options("*", (0, cors_1.default)());
 // Routes
 app.get('/', (req, res) => {
     res.send('Hello from Express + TypeScript server 🚀');

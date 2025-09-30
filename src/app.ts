@@ -16,7 +16,6 @@ app.use(json());
 // CORS - allow all origins (reflect request origin)
 app.use(cors({ origin: true, credentials: true }));
 // Handle preflight for all routes
-app.options("*", cors());
 
 // Routes
 app.get('/', (req, res) => {
