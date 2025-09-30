@@ -5,6 +5,7 @@ import { json } from "express";
 import cors from "cors";
 import "./config/dotenv.config";
 import contactRouter from "./routes/contact.routes";
+import ghostRouter from "./routes/ghost.routes";
 import { AppDataSource } from "./typeorm/data-source";
 
 const app = express();
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/contact', contactRouter);
+app.use('/ghost', ghostRouter);
 
 app.get('/health', (req, res) => {
   const db = AppDataSource.isInitialized ? 'up' : 'down';

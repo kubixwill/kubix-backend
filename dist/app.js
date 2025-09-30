@@ -10,6 +10,7 @@ const express_2 = require("express");
 const cors_1 = __importDefault(require("cors"));
 require("./config/dotenv.config");
 const contact_routes_1 = __importDefault(require("./routes/contact.routes"));
+const ghost_routes_1 = __importDefault(require("./routes/ghost.routes"));
 const data_source_1 = require("./typeorm/data-source");
 const app = (0, express_1.default)();
 // Middlewares
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
     res.send('Hello from Express + TypeScript server 🚀');
 });
 app.use('/contact', contact_routes_1.default);
+app.use('/ghost', ghost_routes_1.default);
 app.get('/health', (req, res) => {
     const db = data_source_1.AppDataSource.isInitialized ? 'up' : 'down';
     res.status(200).json({ status: 'ok', db });
