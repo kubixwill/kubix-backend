@@ -8,13 +8,14 @@ dotenv.config({ path: ".env" });
 
 // Load environment-specific variables if applicable
 const environment = process.env.environment?.trim() || "";
-const envFilePath = `.env.${environment}`;
-
-if (environment && fs.existsSync(envFilePath)) {
-  dotenv.config({ path: envFilePath });
-  console.log(`Loaded environment variables from ${envFilePath}`);
-} else {
-  console.warn(`Environment-specific .env file not found: ${envFilePath}`);
+if (environment) {
+  const envFilePath = `.env.${environment}`;
+  if (fs.existsSync(envFilePath)) {
+    dotenv.config({ path: envFilePath });
+    console.log(`Loaded environment variables from ${envFilePath}`);
+  } else {
+    console.warn(`Environment-specific .env file not found: ${envFilePath}`);
+  }
 }
 
 // Fetch PORT safely

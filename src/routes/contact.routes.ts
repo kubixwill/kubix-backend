@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AppDataSource } from "../typeorm/data-source";
 import { Contact } from "../typeorm/entities/Contact";
 import { sheetsService } from "../services/sheets.service";
+import { kylasService } from "../services/kylas.service";
 
 const router = Router();
 
@@ -53,6 +54,13 @@ router.post('/', async (req, res): Promise<void> => {
       }
     }
 
+    // Create/update lead in Kylas CRM and add a contact-us note (non-blocking)
+    try {
+      await kylasService.handleContactSubmission(fullName, email, trimmedMessage);
+    } catch (kylasErr) {
+      console.error("Kylas CRM sync failed", kylasErr);
+    }
+
     res.status(201).json({ id: record.id, fullName: record.fullName, email: record.email, message: record.message });
   } catch (err) {
     console.error("Failed to save contact", err);
@@ -61,5 +69,3 @@ router.post('/', async (req, res): Promise<void> => {
 });
 
 export default router;
-
-

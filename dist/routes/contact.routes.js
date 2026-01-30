@@ -4,6 +4,7 @@ const express_1 = require("express");
 const data_source_1 = require("../typeorm/data-source");
 const Contact_1 = require("../typeorm/entities/Contact");
 const sheets_service_1 = require("../services/sheets.service");
+const kylas_service_1 = require("../services/kylas.service");
 const router = (0, express_1.Router)();
 // Create header row in the configured Google Sheet
 router.post('/header', async (req, res) => {
@@ -48,6 +49,13 @@ router.post('/', async (req, res) => {
             catch (sheetErr) {
                 console.error("Sheets append failed", sheetErr);
             }
+        }
+        // Create/update lead in Kylas CRM and add a contact-us note (non-blocking)
+        try {
+            await kylas_service_1.kylasService.handleContactSubmission(fullName, email, trimmedMessage);
+        }
+        catch (kylasErr) {
+            console.error("Kylas CRM sync failed", kylasErr);
         }
         res.status(201).json({ id: record.id, fullName: record.fullName, email: record.email, message: record.message });
     }

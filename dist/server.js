@@ -11,13 +11,15 @@ const data_source_1 = require("./typeorm/data-source");
 dotenv_1.default.config({ path: ".env" });
 // Load environment-specific variables if applicable
 const environment = process.env.environment?.trim() || "";
-const envFilePath = `.env.${environment}`;
-if (environment && fs_1.default.existsSync(envFilePath)) {
-    dotenv_1.default.config({ path: envFilePath });
-    console.log(`Loaded environment variables from ${envFilePath}`);
-}
-else {
-    console.warn(`Environment-specific .env file not found: ${envFilePath}`);
+if (environment) {
+    const envFilePath = `.env.${environment}`;
+    if (fs_1.default.existsSync(envFilePath)) {
+        dotenv_1.default.config({ path: envFilePath });
+        console.log(`Loaded environment variables from ${envFilePath}`);
+    }
+    else {
+        console.warn(`Environment-specific .env file not found: ${envFilePath}`);
+    }
 }
 // Fetch PORT safely
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
